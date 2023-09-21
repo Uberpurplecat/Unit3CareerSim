@@ -5,6 +5,7 @@ import CreatePost from './CreatePost';
 import Posts from './Posts';
 import Post from './Post';
 import AboutUs from './AboutUs';
+import ContactUs from './ContactUs';
 
 import { useNavigate, useParams, Link, Routes, Route } from 'react-router-dom';
 
@@ -16,7 +17,8 @@ function App() {
 
   useEffect(()=> {
     const fetchPosts = async()=> {
-      const posts = await api.fetchPosts();
+      let posts = await api.fetchPosts();
+      posts = checkPrice(posts);
       setPosts(posts);
     };
     fetchPosts();
@@ -56,6 +58,24 @@ function App() {
     navigate(`/posts/${post._id}`);
   };
 
+  const onDelete = (id)=> {
+    const arr = posts.filter((item)=> item._id !== id)
+    setPosts(arr)
+    navigate(`/`);
+  }
+
+  const checkPrice = (arr)=> {
+    const array = arr.map((item)=>{
+      if ( isNaN(item.price)){
+        item.price = 0.00;
+      }
+      return item
+    })
+    return array;
+  }
+
+ 
+
 
   return (
     <>
@@ -64,11 +84,12 @@ function App() {
         auth.username ? (
           <div>
             <h1>
-              Welcome { auth.username }
+              Welcome { auth.username }<br/> You have {auth.posts.length} posts<br/>
               <button onClick={ logout }>Logout</button>
             </h1>
             <Link to='/posts/create'>Create A Post</Link>
             <Link to='/about_us'>About Us</Link>
+            <Link to='/contact_us'>Contact Us</Link>
             <Routes>
               <Route path='/posts/create' element={ <CreatePost createPost={ createPost } />} />
             </Routes>
@@ -78,13 +99,15 @@ function App() {
             <AuthForm submit={ register } txt='Register'/>
             <AuthForm submit={ login } txt='Login'/>
             <Link to='/about_us'>About Us</Link>
+            <Link to='/contact_us'>Contact Us</Link>
           </>
         )
       }
       <Posts posts={ posts } auth={ auth }/>
       <Routes>
-        <Route path='/posts/:id' element={ <Post posts={ posts } auth={ auth }/>} />
+        <Route path='/posts/:id' element={ <Post posts={ posts } auth={ auth } onDelete={ onDelete }/>} />
         <Route path='/about_us' element={ <AboutUs />} />
+        <Route path='/contact_us' element={<ContactUs />}/>
       </Routes>
     </>
   )

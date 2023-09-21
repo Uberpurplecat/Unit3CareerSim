@@ -1,7 +1,7 @@
 const AboutUs = ()=> {
   return (
     <div>
-      TODO: Add some information about Us!
+      <div>We are essentialy a pawn shop with a twist of puppies!</div>
     </div>
   );
 };
